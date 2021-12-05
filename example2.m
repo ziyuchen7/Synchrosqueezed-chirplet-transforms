@@ -87,7 +87,7 @@ plot(t_show,am1(t_idx), 'color', 'b', 'linewidth', 1);
 hold on;
 plot(t_show,am2(t_idx), 'color', 'r', 'linewidth', 1);
 xlim([1 9]);
-set(gca,'fontsize',100)
+set(gca,'fontsize',100) 
     
 figure('Position',[1 scrsz(4)/2 scrsz(3) scrsz(4)])
 plot(t_show,if1(t_idx), 'color', 'b', 'linewidth', 1);

@@ -15,9 +15,7 @@ SSTinverse.m -- inverse map of SCT
 
 example1.m -- example of standard linear chirps
 
-example2.m -- example of a time-varying chirp rate signal
+example2.m -- example of a signal with time-varying chirp rate
 
-example3.m -- example of a signal with parabolic IFs
-
-example4.m -- example of wolf howling signal
+example3.m -- example of wolf howling signal
 

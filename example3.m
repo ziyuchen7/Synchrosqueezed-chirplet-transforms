@@ -1,4 +1,4 @@
-% example of the wolf howling signal
+% example of a wolf howling signal
 clear all; close all;
 
 [x,Hz] = audioread('Wolf.wav');
@@ -32,48 +32,49 @@ time_stamp = hop/Hz;
 return;
 
 % Then run the block you want:
-    %% figure 11
+    %% figure 12
 figure()
 imageSQ(Hz*tfrtic, Hz^2*tcrtic, abs(squeeze(tfc1(:,:,161))).^2, 0.9999); axis xy; colormap(1-gray); 
 xlabel('frequency (Hz)'); ylabel('chirp rate');
-set(gca,'fontsize',40)
 
 figure()
 imageSQ(Hz*tfrtic, Hz^2*tcrtic, abs(squeeze(tfrsq1(:,:,161))).^2, 0.9999); axis xy; colormap(1-gray); 
 xlabel('frequency (Hz)'); ylabel('chirp rate');
-set(gca,'fontsize',40)
+
+figure()
+imageSQ(Hz*tfrtic, Hz^2*tcrtic, abs(squeeze(tfc2(:,:,161))).^2, 0.9999); axis xy; colormap(1-gray); 
+xlabel('frequency (Hz)'); ylabel('chirp rate');
+
+figure()
+imageSQ(Hz*tfrtic, Hz^2*tcrtic, abs(squeeze(tfrsq2(:,:,161))).^2, 0.9999); axis xy; colormap(1-gray); 
+xlabel('frequency (Hz)'); ylabel('chirp rate');
 
 figure()
 imageSQ(Hz*tfrtic, Hz^2*tcrtic, abs(squeeze(tfc1(:,:,431))).^2, 0.9999); axis xy; colormap(1-gray); 
 xlabel('frequency (Hz)'); ylabel('chirp rate');
-set(gca,'fontsize',40)
 
 figure()
 imageSQ(Hz*tfrtic, Hz^2*tcrtic, abs(squeeze(tfrsq1(:,:,431))).^2, 0.9999); axis xy; colormap(1-gray); 
 xlabel('frequency (Hz)'); ylabel('chirp rate');
-set(gca,'fontsize',40)
 
 figure()
 imageSQ(Hz*tfrtic, Hz^2*tcrtic, abs(squeeze(tfc2(:,:,431))).^2, 0.9999); axis xy; colormap(1-gray); 
 xlabel('frequency (Hz)'); ylabel('chirp rate');
-set(gca,'fontsize',40)
 
 figure()
 imageSQ(Hz*tfrtic, Hz^2*tcrtic, abs(squeeze(tfrsq2(:,:,431))).^2, 0.9999); axis xy; colormap(1-gray); 
 xlabel('frequency (Hz)'); ylabel('chirp rate');
-set(gca,'fontsize',40)
 
 figure()
 imageSQ(Hz*tfrtic, Hz^2*tcrtic, abs(squeeze(tfc2(:,:,571))).^2, 0.9999); axis xy; colormap(1-gray); 
 xlabel('frequency (Hz)'); ylabel('chirp rate');
-set(gca,'fontsize',40)
 
 figure()
 imageSQ(Hz*tfrtic, Hz^2*tcrtic, abs(squeeze(tfrsq2(:,:,571))).^2, 0.9999); axis xy; colormap(1-gray); 
 xlabel('frequency (Hz)'); ylabel('chirp rate');
-set(gca,'fontsize',40)
 
-    %% figure 1
+
+    %% plot the STFT and the 2nd-order SST
 figure() % STFT
 imageSQ(16:time_stamp:16+time_stamp*(size(tfrsq0,2)-1), Hz*tfrtic0, abs(tfr0), 0.9999); axis xy; colormap(1-gray); 
 xlabel('time (s)');ylabel('frequency (Hz)');
@@ -82,7 +83,7 @@ figure() % 2nd-order SST
 imageSQ(16:time_stamp:16+time_stamp*(size(tfrsq0,2)-1), Hz*tfrtic0, abs(tfrsq2nd), 0.9999); axis xy; colormap(1-gray); 
 xlabel('time (s)');ylabel('frequency (Hz)');
 
-    %% figure 1, plot of the signal
+    %% plot the signal
 scrsz = get(0,'ScreenSize');
 
 figure('Position',[1 scrsz(4)/2 scrsz(3) scrsz(4)/3])
@@ -90,32 +91,23 @@ plot(16:1/Hz:16+(length(xm)-1)/Hz,xm, 'color', 'k', 'linewidth', 1);
 xlabel('time (s)')
 set(gca,'fontsize',30)
 
+
+
     %% 3d plot of chirplet transform with g_0
-D = tfc1;
+QN = 6 ;
+D = tfc2;
 thresh = quantile(abs(D(:)),0.9999);
-idx = find(abs(D)>quantile(abs(D(:)),0.9999));
-[I1,I2,I3] = ind2sub(size(D),idx);
-scatter3(16+(I3-1)/Hz,tfrtic(I2)*Hz,tcrtic(I1)*Hz^2,20,1-[1 1 1]);
-hold on
-thresh = quantile(abs(D(:)),0.999);
-idx = find(abs(D)>quantile(abs(D(:)),0.999) & abs(D)<=quantile(abs(D(:)),0.9999));
-[I1,I2,I3] = ind2sub(size(D),idx);
-scatter3(16+(I3-1)/Hz,tfrtic(I2)*Hz,tcrtic(I1)*Hz^2,20,1-[0.7 0.7 0.7]);
-
-thresh = quantile(abs(D(:)),0.995);
-idx = find(abs(D)>quantile(abs(D(:)),0.995) & abs(D)<=quantile(abs(D(:)),0.999));
-[I1,I2,I3] = ind2sub(size(D),idx);
-scatter3(16+(I3-1)/Hz,tfrtic(I2)*Hz,tcrtic(I1)*Hz^2,20,1-[0.5 0.5 0.5]);
-
-thresh = quantile(abs(D(:)),0.99);
-idx = find(abs(D)>quantile(abs(D(:)),0.99) & abs(D)<=quantile(abs(D(:)),0.995));
-[I1,I2,I3] = ind2sub(size(D),idx);
-scatter3(16+(I3-1)/Hz,tfrtic(I2)*Hz,tcrtic(I1)*Hz^2,20,1-[0.3 0.3 0.3]);
-
-
+D(find(abs(D) < thresh * (10-QN+1)/10)) = thresh * (10-QN)/10 ;
+ 
+for jj = 1: QN
+    idx = find(abs(D) <= thresh * (10-jj+1)/10 & abs(D) > thresh * (10-jj)/10 );
+    [I1,I2,I3] = ind2sub(size(D),idx);
+    scatter3(16+(I3-1)/Hz,tfrtic(I2)*Hz,tcrtic(I1)*Hz^2,20, [1 1 1]*(jj-1)/8, 'filled');
+    hold on
+end
+ 
 view(30,30)
 ylim([0 500])
-zlim([-996 996])
 xlabel('time (s)');
 ylabel('frequency (Hz)');
 zlabel('chirp rate');
@@ -138,19 +130,19 @@ xlabel('time (s)'); ylabel('frequency (Hz)');
 tfproj = zeros(size(tfrsq1,2),size(tfrsq1,3));
 for i = 1:size(tfproj,1)
     for j = 1:size(tfproj,2)
-        tfproj(i,j) = sum(abs(squeeze(tfrsq2(:,i,j))));
+        tfproj(i,j) = sum(abs(squeeze(tfrsq1(:,i,j))));
     end
 end
 figure()
-imageSQ(16:1/Hz:17-1/Hz, Hz*tfrtic, abs(tfproj), 0.9999); axis xy; colormap(1-gray); 
+imageSQ(16:1/Hz:17-1/Hz, Hz*tfrtic, abs(tfproj), 1); axis xy; colormap(1-gray); 
 xlabel('time (s)'); ylabel('frequency (Hz)'); 
 
-    %% scatter plot of SST
-val = 0.9999;
-thresh = quantile(abs(tfrsq2(:)),val);
-idx = find(tfrsq2>thresh);
-[I1,I2,I3] = ind2sub(size(tfrsq2),idx);
-scatter3(16+(I3-1)/Hz,tfrtic(I2)*Hz,tcrtic(I1)*Hz^2,20,abs(tfrsq2(idx)));
+    %% scatter plot of SCT
+val = 0.9995;
+thresh = quantile(abs(tfrsq1(:)),val);
+idx = find(tfrsq1>thresh);
+[I1,I2,I3] = ind2sub(size(tfrsq1),idx);
+scatter3(16+(I3-1)/Hz,tfrtic(I2)*Hz,tcrtic(I1)*Hz^2,20,abs(tfrsq1(idx)));
 view(30,30)
 ylim([0 500])
 xlabel('time (s)');

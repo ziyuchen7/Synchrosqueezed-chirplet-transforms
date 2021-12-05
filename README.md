@@ -19,3 +19,4 @@ example2.m -- example of a signal with time-varying chirp rate
 
 example3.m -- example of wolf howling signal
 
+![alt text](https://github.com/ziyuchen7/Synchrosqueezed-chirplet-transforms/edit/main/example1-CT3Dview.gif?raw=true)

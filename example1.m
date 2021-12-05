@@ -50,7 +50,7 @@ t_show = t(t_idx);
 
 return;
 % Then run the block you want:
-%% figure 2 plot the upsampled signal and their IFs
+%% plot the upsampled signal and their IFs
 scrsz = get(0,'ScreenSize');
 
 t_up = [1/500:1/500:6]' ;
@@ -72,26 +72,26 @@ plot(t_up_show,real(y2(t_up_idx)), 'color', 'k', 'linewidth', 1);
 xlabel('time (s)')
 set(gca,'fontsize',70)
 
-figure('Position',[1 scrsz(4)/2 scrsz(3) scrsz(4)*2/3])
+figure()
 plot(t_up_show,real(y1(t_up_idx)+y2(t_up_idx)), 'color', 'k', 'linewidth', 1);
 xlabel('time (s)')
-set(gca,'fontsize',70)
+set(gca,'fontsize',30)
 
 if1 = 8*t;
 if2 = -2*pi*t+(24+6*pi);
 
-figure('Position',[1 scrsz(4)/2 scrsz(3) scrsz(4)*2/3])
+figure()
 plot(t_show,if1(t_idx),'LineWidth',2);
 hold on
 plot(t_show,if2(t_idx),'LineWidth',2);
 xlabel('time (s)');
 ylabel('frequency (Hz)')
 ylim([0 50])
-set(gca,'fontsize',70)
+set(gca,'fontsize',30)
 
 
 
-%% figure 3
+%% plot the frequency-chirp rate slice of CT and SCT with g_0 and g_2 at 2s and 3s
 figure()
 imageSQ(Hz*tfrtic, Hz^2*tcrtic, abs(squeeze(tfc1(:,:,200))), 1); axis xy; colormap(1-gray); 
 xlabel('frequency (Hz)'); ylabel('chirp rate'); 
@@ -117,7 +117,7 @@ imageSQ(Hz*tfrtic, Hz^2*tcrtic, abs(squeeze(tfrsq2(:,:,300))), 1); axis xy; colo
 xlabel('frequency (Hz)'); ylabel('chirp rate'); 
 
 
-%% figure 4
+%% plot the contrast of CT and SCT with g_0 and g_2 at 3s (crossover)
 figure()
 A1 = abs(squeeze(tfc1(:,73,300)));
 plot(tcrtic*Hz^2,A1, 'color', 'k');
@@ -146,7 +146,7 @@ xlim([-tcrtic(end)*Hz^2 tcrtic(end)*Hz^2])
 xlabel('chirp rate')
 set(gca,'fontsize',30)
 
-%% figure 4 continue spectral clustering
+%% spectral clustering to extract IFs and ICs
 sigma = 60;
 q = 0.9995;
 mat = tfrsq2(:,:,t_idx);
@@ -210,28 +210,20 @@ line2 = [block1; line2; block2];
 line1_int = [block1; line1_int; block2];
 line2_int = [block1; line2_int; block2];
 
-    %% 3d plot of chirplet transform with g_0 (not shown)
+
+    %% 3d plot of chirplet transform with g_0
+QN = 5 ;
 D = tfc1(:,:,t_idx);
 thresh = quantile(abs(D(:)),0.9999);
-idx = find(abs(D)>quantile(abs(D(:)),0.9999));
-[I1,I2,I3] = ind2sub(size(D),idx);
-scatter3((I3+99)/Hz,tfrtic(I2)*Hz,tcrtic(I1)*Hz^2,20,1-[1 1 1]);
-hold on
-thresh = quantile(abs(D(:)),0.999);
-idx = find(abs(D)>quantile(abs(D(:)),0.999) & abs(D)<=quantile(abs(D(:)),0.9999));
-[I1,I2,I3] = ind2sub(size(D),idx);
-scatter3((I3+99)/Hz,tfrtic(I2)*Hz,tcrtic(I1)*Hz^2,20,1-[0.7 0.7 0.7]);
-
-thresh = quantile(abs(D(:)),0.995);
-idx = find(abs(D)>quantile(abs(D(:)),0.995) & abs(D)<=quantile(abs(D(:)),0.999));
-[I1,I2,I3] = ind2sub(size(D),idx);
-scatter3((I3+99)/Hz,tfrtic(I2)*Hz,tcrtic(I1)*Hz^2,20,1-[0.5 0.5 0.5]);
-
-thresh = quantile(abs(D(:)),0.99);
-idx = find(abs(D)>quantile(abs(D(:)),0.99) & abs(D)<=quantile(abs(D(:)),0.995));
-[I1,I2,I3] = ind2sub(size(D),idx);
-scatter3((I3+99)/Hz,tfrtic(I2)*Hz,tcrtic(I1)*Hz^2,20,1-[0.3 0.3 0.3]);
-
+D(find(abs(D) < thresh * (10-QN+1)/10)) = thresh * (10-QN)/10 ;
+ 
+for jj = 1: QN
+    idx = find(abs(D) <= thresh * (10-jj+1)/10 & abs(D) > thresh * (10-jj)/10 );
+    [I1,I2,I3] = ind2sub(size(D),idx);
+    scatter3((I3+99)/Hz,tfrtic(I2)*Hz,tcrtic(I1)*Hz^2,20, [1 1 1]*(jj-1)/8, 'filled');
+    hold on
+end
+ 
 view(30,30)
 ylim([0 50])
 zlim([-16.55 16.55])
@@ -242,28 +234,42 @@ colormap(1-gray)
 colorbar
 set(gca,'fontsize',20)
 
-    %% figure 4, 3d plot of chirplet transform with g_2
+    %% 3d plot of SCT with g_0
+QN = 5 ;
+D = tfrsq1(:,:,t_idx);
+thresh = quantile(abs(D(:)),0.9999);
+D(find(abs(D) < thresh * (10-QN+1)/10)) = thresh * (10-QN)/10 ;
+ 
+for jj = 1: QN
+    idx = find(abs(D) <= thresh * (10-jj+1)/10 & abs(D) > thresh * (10-jj)/10 );
+    [I1,I2,I3] = ind2sub(size(D),idx);
+    scatter3((I3+99)/Hz,tfrtic(I2)*Hz,tcrtic(I1)*Hz^2,20, [1 1 1]*(jj-1)/8, 'filled');
+    hold on
+end
+ 
+view(30,30)
+ylim([0 50])
+zlim([-16.55 16.55])
+xlabel('time (s)');
+ylabel('frequency (Hz)');
+zlabel('chirp rate');
+colormap(1-gray)
+colorbar
+set(gca,'fontsize',20)
+
+    %% 3d plot of chirplet transform with g_2
+QN = 5 ;
 D = tfc2(:,:,t_idx);
 thresh = quantile(abs(D(:)),0.9999);
-idx = find(abs(D)>quantile(abs(D(:)),0.9999));
-[I1,I2,I3] = ind2sub(size(D),idx);
-scatter3((I3+99)/Hz,tfrtic(I2)*Hz,tcrtic(I1)*Hz^2,20,1-[1 1 1]);
-hold on
-thresh = quantile(abs(D(:)),0.999);
-idx = find(abs(D)>quantile(abs(D(:)),0.999) & abs(D)<=quantile(abs(D(:)),0.9999));
-[I1,I2,I3] = ind2sub(size(D),idx);
-scatter3((I3+99)/Hz,tfrtic(I2)*Hz,tcrtic(I1)*Hz^2,20,1-[0.7 0.7 0.7]);
-
-thresh = quantile(abs(D(:)),0.995);
-idx = find(abs(D)>quantile(abs(D(:)),0.995) & abs(D)<=quantile(abs(D(:)),0.999));
-[I1,I2,I3] = ind2sub(size(D),idx);
-scatter3((I3+99)/Hz,tfrtic(I2)*Hz,tcrtic(I1)*Hz^2,20,1-[0.5 0.5 0.5]);
-
-thresh = quantile(abs(D(:)),0.99);
-idx = find(abs(D)>quantile(abs(D(:)),0.99) & abs(D)<=quantile(abs(D(:)),0.995));
-[I1,I2,I3] = ind2sub(size(D),idx);
-scatter3((I3+99)/Hz,tfrtic(I2)*Hz,tcrtic(I1)*Hz^2,20,1-[0.3 0.3 0.3]);
-
+D(find(abs(D) < thresh * (10-QN+1)/10)) = thresh * (10-QN)/10 ;
+ 
+for jj = 1: QN
+    idx = find(abs(D) <= thresh * (10-jj+1)/10 & abs(D) > thresh * (10-jj)/10 );
+    [I1,I2,I3] = ind2sub(size(D),idx);
+    scatter3((I3+99)/Hz,tfrtic(I2)*Hz,tcrtic(I1)*Hz^2,20, [1 1 1]*(jj-1)/8, 'filled');
+    hold on
+end
+ 
 view(30,30)
 ylim([0 50])
 zlim([-16.55 16.55])
@@ -274,28 +280,19 @@ colormap(1-gray)
 colorbar
 set(gca,'fontsize',20)
 
-    %% figure 4, 3d plot of SCT with g_2
+    %% 3d plot of SCT with g_2
+QN = 5 ;
 D = tfrsq2(:,:,t_idx);
 thresh = quantile(abs(D(:)),0.9999);
-idx = find(abs(D)>quantile(abs(D(:)),0.9999));
-[I1,I2,I3] = ind2sub(size(D),idx);
-scatter3((I3+99)/Hz,tfrtic(I2)*Hz,tcrtic(I1)*Hz^2,20,1-[1 1 1]);
-hold on
-thresh = quantile(abs(D(:)),0.999);
-idx = find(abs(D)>quantile(abs(D(:)),0.999) & abs(D)<=quantile(abs(D(:)),0.9999));
-[I1,I2,I3] = ind2sub(size(D),idx);
-scatter3((I3+99)/Hz,tfrtic(I2)*Hz,tcrtic(I1)*Hz^2,20,1-[0.7 0.7 0.7]);
+D(find(abs(D) < thresh * (10-QN+1)/10)) = thresh * (10-QN)/10 ;
 
-thresh = quantile(abs(D(:)),0.995);
-idx = find(abs(D)>quantile(abs(D(:)),0.995) & abs(D)<=quantile(abs(D(:)),0.999));
-[I1,I2,I3] = ind2sub(size(D),idx);
-scatter3((I3+99)/Hz,tfrtic(I2)*Hz,tcrtic(I1)*Hz^2,20,1-[0.5 0.5 0.5]);
-
-thresh = quantile(abs(D(:)),0.99);
-idx = find(abs(D)>quantile(abs(D(:)),0.99) & abs(D)<=quantile(abs(D(:)),0.995));
-[I1,I2,I3] = ind2sub(size(D),idx);
-scatter3((I3+99)/Hz,tfrtic(I2)*Hz,tcrtic(I1)*Hz^2,20,1-[0.3 0.3 0.3]);
-
+for jj = 1: QN
+    idx = find(abs(D) <= thresh * (10-jj+1)/10 & abs(D) > thresh * (10-jj)/10 );
+    [I1,I2,I3] = ind2sub(size(D),idx);
+    scatter3((I3+99)/Hz,tfrtic(I2)*Hz,tcrtic(I1)*Hz^2,20, [1 1 1]*(jj-1)/8, 'filled');
+    hold on
+end
+ 
 view(30,30)
 ylim([0 50])
 zlim([-16.55 16.55])
@@ -304,9 +301,10 @@ ylabel('frequency (Hz)');
 zlabel('chirp rate');
 colormap(1-gray)
 colorbar
-set(gca,'fontsize',20)
+set(gca,'fontsize',30)
 
-%%  figure 5
+
+%%  plot the frequency-chirp rate slice and contrast of CT with g_3, g_4 and g_5 at 3s
 figure()
 imageSQ(Hz*tfrtic, Hz^2*tcrtic, abs(squeeze(tfc3(:,:,300))), 1); axis xy; colormap(1-gray); 
 xlabel('frequency (Hz)'); ylabel('chirp rate'); 
@@ -343,7 +341,7 @@ xlim([-tcrtic(end)*Hz^2 tcrtic(end)*Hz^2])
 xlabel('chirp rate')
 set(gca,'fontsize',30)
 
-%%  figure 5 continue
+%%  plot the frequency-chirp rate slice and contrast of SCT with g_3, g_4 and g_5 at 3s
 figure()
 imageSQ(Hz*tfrtic, Hz^2*tcrtic, abs(squeeze(tfrsq3(:,:,300))), 1); axis xy; colormap(1-gray); 
 xlabel('frequency (Hz)'); ylabel('chirp rate'); 
@@ -377,9 +375,9 @@ xlim([-tcrtic(end)*Hz^2 tcrtic(end)*Hz^2])
 xlabel('chirp rate')
 set(gca,'fontsize',30)
 
-%%  figure 6
-ts = 300;
-[invpts] = SSTinverse(x, 0, 0.5, 2/length(x), 1, h1, Dh1, DDh1, ts, line2_int(ts,1), line2_int(ts,2), 3, 3);
+%%  inverse SCT
+ts = 300; % time in samples
+[invpts] = SCTinverse(x, 0, 0.5, 2/length(x), 1, h1, Dh1, DDh1, ts, line2_int(ts,1), line2_int(ts,2), 3, 3);
 
 figure
 scatter(tfrtic(invpts(:,1))*Hz,tcrtic(invpts(:,2))*Hz^2,[],invpts(:,3).^1, 'filled');
@@ -388,7 +386,7 @@ xlim([0 50])
 colorbar;
 set(gca,'fontsize',30)
 
-%% figure 7
+%% reconstruction from 2nd-order SST
 scrsz = get(0,'ScreenSize');
 [x_recon1] = recon_sqSTCT(x, 0, 0.5, 2/length(x), 1, h1, Dh1, DDh1, ...
     line1_int(:,1), line1_int(:,2), 5, 5);
@@ -433,7 +431,7 @@ errorS1 = norm(real(x1(S1_idx))-real(x_recon1(S1_idx)))/norm(real(x1(S1_idx)));
 S2_idx = setdiff(t_idx,S1_idx);
 errorS2 = norm(real(x1(S2_idx))-real(x_recon1(S2_idx)))/norm(real(x1(S2_idx)));
 
-    %% figure 7 continue
+%% reconstruction by the group scheme from CT
 scrsz = get(0,'ScreenSize');
 chirp1 = line1(:,2);
 chirp2 = line2(:,2);
@@ -521,7 +519,7 @@ figure()
 imageSQ(t(t_idx), Hz*tfrtic, abs(tfproj(:,t_idx)), 0.9999); axis xy; colormap(1-gray); 
 xlabel('time (s)'); ylabel('frequency (Hz)'); 
 
-    %% projection of SST-CT onto TF plane
+    %% projection of SCT onto TF plane
 tfproj = zeros(size(tfrsq1,2),size(tfrsq1,3));
 for i = 1:size(tfproj,1)
     for j = 1:size(tfproj,2)
@@ -587,35 +585,38 @@ xlabel('time (s)'); ylabel('frequency (Hz)');
 % set(gca,'fontsize',20)
 
 %% generate animation of rotation
-filename = 'rotation2.gif';
+filename = 'rotation0.gif';
 
-D = tfrsq2(:,:,t_idx);
-thresh1 = quantile(abs(D(:)),0.9999);
-idx1 = find(abs(D)>quantile(abs(D(:)),0.9999));
-[I11,I12,I13] = ind2sub(size(D),idx1);
+QN = 5 ;
+D = tfc1(:,:,t_idx);
+thresh = quantile(abs(D(:)),0.9999);
+D(find(abs(D) < thresh * (10-QN+1)/10)) = thresh * (10-QN)/10 ;
+ 
+idx = find(abs(D) <= thresh * (10-1+1)/10 & abs(D) > thresh * (10-1)/10 );
+[I11,I12,I13] = ind2sub(size(D),idx);
 
-thresh2 = quantile(abs(D(:)),0.999);
-idx2 = find(abs(D)>quantile(abs(D(:)),0.999) & abs(D)<=quantile(abs(D(:)),0.9999));
-[I21,I22,I23] = ind2sub(size(D),idx2);
+idx = find(abs(D) <= thresh * (10-2+1)/10 & abs(D) > thresh * (10-2)/10 );
+[I21,I22,I23] = ind2sub(size(D),idx);
 
-thresh3 = quantile(abs(D(:)),0.995);
-idx3 = find(abs(D)>quantile(abs(D(:)),0.995) & abs(D)<=quantile(abs(D(:)),0.999));
-[I31,I32,I33] = ind2sub(size(D),idx3);
+idx = find(abs(D) <= thresh * (10-3+1)/10 & abs(D) > thresh * (10-3)/10 );
+[I31,I32,I33] = ind2sub(size(D),idx);
 
-thresh4 = quantile(abs(D(:)),0.99);
-idx4 = find(abs(D)>quantile(abs(D(:)),0.99) & abs(D)<=quantile(abs(D(:)),0.995));
-[I41,I42,I43] = ind2sub(size(D),idx4);
+idx = find(abs(D) <= thresh * (10-4+1)/10 & abs(D) > thresh * (10-4)/10 );
+[I41,I42,I43] = ind2sub(size(D),idx);
+
+idx = find(abs(D) <= thresh * (10-5+1)/10 & abs(D) > thresh * (10-5)/10 );
+[I51,I52,I53] = ind2sub(size(D),idx);
 
 h = figure;
 angle = 0:3.6:360;
 for i = 1:length(angle)
     clf;
-    scatter3((I13+99)/Hz,tfrtic(I12)*Hz,tcrtic(I11)*Hz^2,20,1-[1 1 1]);
+    scatter3((I13+99)/Hz,tfrtic(I12)*Hz,tcrtic(I11)*Hz^2,20, [1 1 1]*(1-1)/8, 'filled');
     hold on
-    scatter3((I23+99)/Hz,tfrtic(I22)*Hz,tcrtic(I21)*Hz^2,20,1-[0.7 0.7 0.7]);
-    scatter3((I33+99)/Hz,tfrtic(I32)*Hz,tcrtic(I31)*Hz^2,20,1-[0.5 0.5 0.5]);
-    scatter3((I43+99)/Hz,tfrtic(I42)*Hz,tcrtic(I41)*Hz^2,20,1-[0.3 0.3 0.3]);
-    
+    scatter3((I23+99)/Hz,tfrtic(I22)*Hz,tcrtic(I21)*Hz^2,20, [1 1 1]*(2-1)/8, 'filled');
+    scatter3((I33+99)/Hz,tfrtic(I32)*Hz,tcrtic(I31)*Hz^2,20, [1 1 1]*(3-1)/8, 'filled');
+    scatter3((I43+99)/Hz,tfrtic(I42)*Hz,tcrtic(I41)*Hz^2,20, [1 1 1]*(4-1)/8, 'filled');
+    scatter3((I53+99)/Hz,tfrtic(I52)*Hz,tcrtic(I51)*Hz^2,20, [1 1 1]*(5-1)/8, 'filled');
     view(angle(i),30)
     ylim([0 50])
     zlim([-16.55 16.55])

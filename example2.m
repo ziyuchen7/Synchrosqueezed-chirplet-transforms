@@ -22,13 +22,13 @@ am2 = 2 + am2 ./ max(abs(am2)) ;
 
     %% the instantaneous chirp-rate of the simulated signal
 chirp1 = smooth(cumsum(randn(N,1)) ./ Hz, 400, 'loess') ;
-chirp1 = 1.5 + chirp1 ./ max(abs(chirp1))/5 ;
+chirp1 = 4.5 + chirp1 ./ max(abs(chirp1))/5 ;
 chirp2 = smooth(cumsum(randn(N,1)) ./ Hz, 300, 'loess') ;
-chirp2 = -1 + chirp2 ./ max(abs(chirp2))/4 ;
+chirp2 = -4 + chirp2 ./ max(abs(chirp2))/4 ;
  
     %% the instantaneous frequency of the simulated signal
-if1 = cumsum(chirp1) / Hz + 1; 
-if2 = cumsum(chirp2) / Hz + 12; 
+if1 = cumsum(chirp1) / Hz + 2; 
+if2 = cumsum(chirp2) / Hz + 44; 
 phi1 = cumsum(if1) / Hz ; 
 phi2 = cumsum(if2) / Hz ; 
  
@@ -53,45 +53,52 @@ xm = clean + noise ; % input signal
 t_idx = 100:900;
 t_show = time(t_idx);
 
-    %% figure 8
+    %% plot signals and their IFs and ICs
 scrsz = get(0,'ScreenSize');
 
-figure('Position',[1 scrsz(4)/2 scrsz(3) scrsz(4)*2/3])
-plot(t_show,real(s1(t_idx)), 'color', 'k', 'linewidth', 1);
+figure('Position',[1 scrsz(4)/2 scrsz(3) scrsz(4)])
+plot(t_show,real(s1(t_idx)), 'color', 'k');
+xlabel('time (s)');
 xlim([1 9]);
-set(gca,'fontsize',70)
+set(gca,'fontsize',100)
 
-figure('Position',[1 scrsz(4)/2 scrsz(3) scrsz(4)*2/3])
-plot(t_show,real(s2(t_idx)), 'color', 'k', 'linewidth', 1);
+figure('Position',[1 scrsz(4)/2 scrsz(3) scrsz(4)])
+plot(t_show,real(s2(t_idx)), 'color', 'k');
+xlabel('time (s)');
 xlim([1 9]);
-set(gca,'fontsize',70)
+set(gca,'fontsize',100)
 
-figure('Position',[1 scrsz(4)/2 scrsz(3) scrsz(4)*2/3])
-plot(t_show,real(s1(t_idx)+s2(t_idx)), 'color', 'k', 'linewidth', 1);
+figure('Position',[1 scrsz(4)/2 scrsz(3) scrsz(4)])
+plot(t_show,real(s1(t_idx)+s2(t_idx)), 'color', 'k');
+xlabel('time (s)');
 xlim([1 9]);
-set(gca,'fontsize',70)
+ylim([-5 5]);
+set(gca,'fontsize',100)
 
-figure('Position',[1 scrsz(4)/2 scrsz(3) scrsz(4)*2/3])
-plot(t_show,real(xm(t_idx)), 'color', 'k', 'linewidth', 1);
+figure('Position',[1 scrsz(4)/2 scrsz(3) scrsz(4)])
+plot(t_show,real(xm(t_idx)), 'color', 'k');
+xlabel('time (s)');
 xlim([1 9]);
-set(gca,'fontsize',70)
+ylim([-5 5]);
+set(gca,'fontsize',100)
 
-figure('Position',[1 scrsz(4)/2 scrsz(3) scrsz(4)*2/3])
+figure('Position',[1 scrsz(4)/2 scrsz(3) scrsz(4)])
 plot(t_show,am1(t_idx), 'color', 'b', 'linewidth', 1);
 hold on;
 plot(t_show,am2(t_idx), 'color', 'r', 'linewidth', 1);
 xlim([1 9]);
-set(gca,'fontsize',70)
+set(gca,'fontsize',100)
     
-figure('Position',[1 scrsz(4)/2 scrsz(3) scrsz(4)*2/3])
+figure('Position',[1 scrsz(4)/2 scrsz(3) scrsz(4)])
 plot(t_show,if1(t_idx), 'color', 'b', 'linewidth', 1);
 ylabel('frequency (Hz)');
 hold on;
 plot(t_show,if2(t_idx), 'color', 'r', 'linewidth', 1);
 xlim([1 9]);
+ylim([0 50]);
 xlabel('time (s)');
 ylabel('frequency (Hz)');
-set(gca,'fontsize',70)
+set(gca,'fontsize',100)
 
 figure('Position',[1 scrsz(4)/2 scrsz(3) scrsz(4)*2/3])
 plot(t_show,chirp1(t_idx), 'color', 'b', 'linewidth', 1);
@@ -101,17 +108,17 @@ xlim([1 9]);
 xlabel('time (s)');
 ylabel('chirp rate');
 xlim([1 9])
-set(gca,'fontsize',70)
+set(gca,'fontsize',100)
 
     %% run the SCT with g_0 and g_2
 alpha1 = 1;
-tt = -16:1/Hz:16;
+tt = -8:1/Hz:8;
 h1 = exp(-pi*alpha1*tt.^2'); % window g_0
 Dh1 = dwindow(h1); 
 DDh1 = dwindow(Dh1);
 
 alpha2 = 1;
-tt = -16:1/Hz:16;
+tt = -8:1/Hz:8;
 h2 = tt'.^2.*exp(-pi*alpha2*tt.^2'); % window g_2
 Dh2 = dwindow(h2); 
 DDh2 = dwindow(Dh2);
@@ -119,30 +126,30 @@ DDh2 = dwindow(Dh2);
 [tfc1, tfrtic, tcrtic, tfrsq1, ~] = sqSTCT(xm, 0, 0.5, 2.5/length(xm), 1, h1, Dh1, DDh1);
 [tfc2, ~, ~, tfrsq2, ~] = sqSTCT(xm, 0, 0.5, 2.5/length(xm), 1, h2, Dh2, DDh2);
 return;
-    %% figure 9
+%% frequency-chirp rate slice of CT and SCT with g_0 and g_2 at crossover time and the contrast
 figure()
-imageSQ(Hz*tfrtic, Hz^2*tcrtic, abs(squeeze(tfc1(:,:,466))), 1); axis xy; colormap(1-gray); 
+imageSQ(Hz*tfrtic, Hz^2*tcrtic, abs(squeeze(tfc1(:,:,502))), 1); axis xy; colormap(1-gray); 
 xlabel('frequency (Hz)'); ylabel('chirp rate'); 
 
 figure()
-imageSQ(Hz*tfrtic, Hz^2*tcrtic, abs(squeeze(tfrsq1(:,:,466))), 1); axis xy; colormap(1-gray); 
+imageSQ(Hz*tfrtic, Hz^2*tcrtic, abs(squeeze(tfrsq1(:,:,502))), 1); axis xy; colormap(1-gray); 
 xlabel('frequency (Hz)'); ylabel('chirp rate'); 
 
 figure()
-imageSQ(Hz*tfrtic, Hz^2*tcrtic, abs(squeeze(tfc2(:,:,466))), 1); axis xy; colormap(1-gray); 
+imageSQ(Hz*tfrtic, Hz^2*tcrtic, abs(squeeze(tfc2(:,:,502))), 1); axis xy; colormap(1-gray); 
 xlabel('frequency (Hz)'); ylabel('chirp rate');
 
 figure()
-imageSQ(Hz*tfrtic, Hz^2*tcrtic, abs(squeeze(tfrsq2(:,:,466))), 1); axis xy; colormap(1-gray); 
+imageSQ(Hz*tfrtic, Hz^2*tcrtic, abs(squeeze(tfrsq2(:,:,502))), 1); axis xy; colormap(1-gray); 
 xlabel('frequency (Hz)'); ylabel('chirp rate');
 
 figure()
-plot(tcrtic*Hz^2,abs(squeeze(tfrsq1(:,32,466))), 'color', 'k')
+plot(tcrtic*Hz^2,abs(squeeze(tfrsq1(:,98,502))), 'color', 'k')
 xlabel('chirp rate')
 set(gca,'fontsize',30)
 
 figure()
-plot(tcrtic*Hz^2,abs(squeeze(tfrsq2(:,32,466))), 'color', 'k')
+plot(tcrtic*Hz^2,abs(squeeze(tfrsq2(:,98,502))), 'color', 'k')
 xlabel('chirp rate')
 set(gca,'fontsize',30)
 
@@ -216,7 +223,8 @@ if1 = line1(:,1);
 if2 = line2(:,1);
 line1 = line1_int;
 line2 = line2_int;
-    %% figure 10 (run one of the previous two blocks before this block)
+
+    %% reconstruction (run one of the previous two blocks before this block)
 scrsz = get(0,'ScreenSize');
 rrcon = zeros(2,length(clean));
 scale = alpha1;
@@ -273,8 +281,8 @@ set(gca,'fontsize',70)
 figure()
 imageSQ(time(t_idx), Hz*tfrsqtic0, abs(tfrsq2nd0(:,t_idx)), 0.9999); axis xy; colormap(1-gray); 
 xlabel('time (s)'); ylabel('frequency (Hz)'); 
-set(gca,'fontsize',30)
-    %% figure 8, projection of SCT onto TF plane
+
+    %% projection of SCT onto TF plane
 tfproj = zeros(size(tfrsq1,2),size(tfrsq1,3));
 for i = 1:size(tfproj,1)
     for j = 1:size(tfproj,2)
@@ -284,4 +292,3 @@ end
 figure()
 imageSQ(time(t_idx), Hz*tfrtic, abs(tfproj(:,t_idx)), 0.9999); axis xy; colormap(1-gray); 
 xlabel('time (s)'); ylabel('frequency (Hz)'); 
-set(gca,'fontsize',30)

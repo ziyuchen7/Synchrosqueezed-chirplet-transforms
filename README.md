@@ -11,7 +11,7 @@ sqSTCT.m -- STFT-based Synchrosqueezed chirplet transforms (SCT, including chirp
 
 sqSTFTbase2nd.m -- STFT-based second order SST
 
-SSTinverse.m -- inverse map of SCT
+SCTinverse.m -- inverse map of SCT
 
 example1.m -- example of standard linear chirps
 

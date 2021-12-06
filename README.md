@@ -20,7 +20,8 @@ example2.m -- example of a signal with time-varying chirp rate
 example3.m -- example of wolf howling signal
 
 ![test](./example1-CT3Dview.gif)
-###### 3D visualization of the chirplet transform
+*3D visualization of the chirplet transform*
+
 ![test](./example1-SCT3Dview.gif)
 ###### 3D visualization of the synchrosqueezed chirplet transform
 

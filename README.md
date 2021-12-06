@@ -22,3 +22,5 @@ example3.m -- example of wolf howling signal
 ![test](./example1-CT3Dview.gif)
 
 ![test](./example1-SCT3Dview.gif)
+
+Reference: Disentangling modes with crossover instantaneous frequencies by synchrosqueezed chirplet transforms, from theory to application, https://arxiv.org/pdf/2112.01857.pdf.

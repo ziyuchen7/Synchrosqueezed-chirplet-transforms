@@ -19,7 +19,7 @@ example2.m -- example of a signal with time-varying chirp rate
 
 example3.m -- example of wolf howling signal
 
-![test](./example1-CT3Dview.gif)
+![test](./example1-CT3Dview.gif "Logo Title Text 1")
 
 ![test](./example1-SCT3Dview.gif)
 

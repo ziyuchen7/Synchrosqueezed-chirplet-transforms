@@ -19,8 +19,10 @@ example2.m -- example of a signal with time-varying chirp rate
 
 example3.m -- example of wolf howling signal
 
-![test](./example1-CT3Dview.gif "Logo Title Text 1")
-
+![test](./example1-CT3Dview.gif)
+###### 3D visualization of the chirplet transform
 ![test](./example1-SCT3Dview.gif)
+###### 3D visualization of the synchrosqueezed chirplet transform
+
 
 Reference: Disentangling modes with crossover instantaneous frequencies by synchrosqueezed chirplet transforms, from theory to application, https://arxiv.org/pdf/2112.01857.pdf.

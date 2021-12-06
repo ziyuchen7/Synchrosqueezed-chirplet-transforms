@@ -1,6 +1,8 @@
 # MATLAB code for Synchrosqueezed Chirplet Transforms
 MATLAB code for the implementation of the Synchrosqueezed chirplet transforms with some examples.
 
+Reference: Disentangling modes with crossover instantaneous frequencies by synchrosqueezed chirplet transforms, from theory to application, https://arxiv.org/pdf/2112.01857.pdf.
+
 File explanation:
 
 dwindow.m -- compute the derivative of a given window
@@ -26,6 +28,3 @@ example3.m -- example of wolf howling signal
 ![test](./example1-SCT3Dview.gif)
 
 *3D visualization of the synchrosqueezed chirplet transform*
-
-
-Reference: Disentangling modes with crossover instantaneous frequencies by synchrosqueezed chirplet transforms, from theory to application, https://arxiv.org/pdf/2112.01857.pdf.

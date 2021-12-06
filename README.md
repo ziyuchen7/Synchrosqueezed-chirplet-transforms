@@ -1,4 +1,4 @@
-# Synchrosqueezed-chirplet-transforms
+# MATLAB code for Synchrosqueezed Chirplet Transforms
 MATLAB code for the implementation of the Synchrosqueezed chirplet transforms with some examples.
 
 File explanation:

@@ -28,3 +28,5 @@ example3.m -- example of wolf howling signal
 ![test](./example1-SCT3Dview.gif)
 
 *3D visualization of the synchrosqueezed chirplet transform*
+
+Any questions can be sent to ziyuchen@umass.edu.
